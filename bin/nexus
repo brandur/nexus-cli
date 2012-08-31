@@ -1,0 +1,14 @@
+#!/usr/bin/env ruby
+
+require "bundler/setup"
+Bundler.require
+
+def env!(k)
+  ENV[k] || raise("missing_environment=#{k}")
+end
+
+$http_api_key = env!("HTTP_API_KEY")
+$http_api_url = env!("HTTP_API_URL")
+
+require_relative "../lib/nexus"
+Nexus::Client.new($http_api_url, $http_api_key).run
