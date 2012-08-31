@@ -18,6 +18,19 @@ module Nexus
 
     private
 
+    def colorize_source
+      source = yield
+      case source
+      when "github"
+        black { on_white { source } }
+      when "hackernews"
+        black { on_yellow { source } }
+      when "twitter"
+        on_blue { source }
+      else source
+      end
+    end
+
     def fetch
       begin
         response = @api.get(path: "/events", expects: 200,
@@ -37,7 +50,7 @@ module Nexus
 
     def format(event)
       {
-        event["source"] => true,
+        colorize_source { event["source"] } => true,
         title: event["title"] ? bold { cyan { event["title"] } } : nil,
         content: event["content"] ? green { event["content"] } : nil,
         url: event["url"],
