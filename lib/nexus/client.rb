@@ -21,11 +21,11 @@ module Nexus
     def colorize_source
       source = yield
       case source
-      when "github"
+      when /^github/
         black { on_white { source } }
-      when "hackernews"
+      when /^hackernews/
         black { on_yellow { source } }
-      when "twitter"
+      when /^twitter/
         on_blue { source }
       else source
       end
@@ -50,12 +50,20 @@ module Nexus
 
     def format(event)
       {
-        colorize_source { event["source"] } => true,
+        colorize_source { format_source(event) } => true,
         title: event["title"] ? bold { cyan { event["title"] } } : nil,
         content: event["content"] ? green { event["content"] } : nil,
         url: event["url"],
         published_at: event["published_at"],
       }.merge(event["metadata"] ? event["metadata"] : {})
+    end
+
+    def format_source(event)
+      if user = event["metadata"]["user"]
+        event["source"] + "@" + user
+      else
+        event["source"]
+      end
     end
   end
 end
